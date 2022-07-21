@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Lines};
 
@@ -12,15 +13,23 @@ fn main() {
     let file = File::open("../input.txt").unwrap();
     let file = BufReader::new(file);
 
-    let mut grow_count = 0;
     let mut lines = file.lines();
-    let mut last_val = next_number(&mut lines).unwrap();
+    let mut grow_count = 0;
+    let mut last_sum = 0;
+    let mut queue = VecDeque::new();
 
     while let Some(value) = next_number(&mut lines) {
-        if value > last_val {
+        queue.push_back(value);
+        if queue.len() < 4 {
+            last_sum += value;
+            continue;
+        }
+        let first = queue.pop_front().unwrap();
+        let sum = last_sum - first + value;
+        if sum > last_sum {
             grow_count += 1;
         }
-        last_val = value;
+        last_sum = sum;
     }
 
     println!("{}", grow_count);
